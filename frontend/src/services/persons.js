@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseUrl = `${import.meta.env.VITE_BACKEND_URL}/api/persons`
+const baseUrl = 'https://render-test-npn3.onrender.com/api/persons'
 
 const getAll =() => {
     return axios.get(baseUrl)
