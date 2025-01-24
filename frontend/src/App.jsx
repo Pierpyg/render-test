@@ -82,8 +82,17 @@ const App = () => {
           setNewNumber('');
         })
         .catch(error => {
-          console.error('Error adding person:', error)
-          setPopupMessage({ message: 'Failed to add person to the server.', type: 'deleted' });
+          if (error.response && error.response.data.error) {
+            setPopupMessage({ 
+              message: error.response.data.error, 
+              type: 'error' 
+            });
+          } else {
+            setPopupMessage({ 
+              message: 'An unexpected error occurred.', 
+              type: 'error' 
+            });
+          }
           setTimeout(() => setPopupMessage(null), 5000);
         });
     }
