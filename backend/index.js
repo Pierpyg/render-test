@@ -46,13 +46,18 @@ app.get('/info', (request, response) => {
   })
 })
 
-// Elimina una persona per ID
+
 app.delete('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id;
+  console.log('Received request to delete ID:', id)
   Person.findByIdAndRemove(request.params.id)
     .then(() => {
       response.status(204).end()
     })
-    .catch(error => next(error))
+    .catch(error => {
+      console.error('Error deleting person:', error.message)
+      next(error)
+    })
 })
 
 // Aggiunge una nuova persona
@@ -95,4 +100,5 @@ app.use((error, request, response, next) => {
   }
   next(error)
 })
+
 
