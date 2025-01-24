@@ -53,7 +53,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id;
   console.log(`Received request to delete person with ID: ${id}`); 
 
-  Person.findByIdAndRemove(id)
+  Person.findByIdAndDelete(id)
     .then(result => {
       if (!result) {
         console.log(`No person found with ID: ${id}`); 
