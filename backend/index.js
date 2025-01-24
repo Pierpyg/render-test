@@ -6,8 +6,10 @@ const Person = require('./models/person')
 
 const app = express()
 app.use(cors({
-  origin: 'https://render-test-frontend-dpnp.onrender.com'
+  origin: 'https://render-test-frontend-dpnp.onrender.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
 }))
+
 
 app.use(express.json())
 app.use(morgan('tiny'))
@@ -15,14 +17,14 @@ app.use(morgan('tiny'))
 morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-// Recupera tutte le persone
+
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
   })
 })
 
-// Recupera una persona per ID
+
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
@@ -35,7 +37,7 @@ app.get('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-// Mostra le informazioni del Phonebook
+
 app.get('/info', (request, response) => {
   Person.countDocuments({}).then(count => {
     const currentTime = new Date()
@@ -49,18 +51,25 @@ app.get('/info', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id;
-  console.log('Received request to delete ID:', id)
-  Person.findByIdAndRemove(request.params.id)
-    .then(() => {
-      response.status(204).end()
+  console.log(`Received request to delete person with ID: ${id}`); 
+
+  Person.findByIdAndRemove(id)
+    .then(result => {
+      if (!result) {
+        console.log(`No person found with ID: ${id}`); 
+        return response.status(404).json({ error: 'Person not found' });
+      }
+      console.log(`Successfully deleted person with ID: ${id}`); 
+      response.status(204).end();
     })
     .catch(error => {
-      console.error('Error deleting person:', error.message)
-      next(error)
-    })
-})
+      console.error(`Error in delete handler:`, error.message); 
+      next(error);
+    });
+});
 
-// Aggiunge una nuova persona
+
+
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
@@ -86,19 +95,22 @@ app.post('/api/persons', (request, response, next) => {
   })
 })
 
-// Porta dal file .env
+
 const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
 
-// Gestione errori middleware
+
 app.use((error, request, response, next) => {
-  console.error(error.message)
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+  console.error('Error middleware:', error.message); 
+
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'Malformatted ID' });
   }
-  next(error)
-})
+
+  next(error);
+});
+
 
 
