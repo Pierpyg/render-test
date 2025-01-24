@@ -95,6 +95,31 @@ app.post('/api/persons', (request, response, next) => {
   })
 })
 
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body; 
+
+  
+  const updatedPerson = {
+    name,
+    number,
+  };
+
+  
+  Person.findByIdAndUpdate(
+    request.params.id, 
+    updatedPerson, 
+    { new: true, runValidators: true, context: 'query' } 
+  )
+    .then(updated => {
+      if (updated) {
+        response.json(updated);
+      } else {
+        response.status(404).json({ error: 'Person not found' });
+      }
+    })
+    .catch(error => next(error)); 
+});
+
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
