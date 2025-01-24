@@ -82,7 +82,7 @@ const App = () => {
           setNewNumber('');
         })
         .catch(error => {
-          if (error.response && error.response.data.error) {
+          if (error.response && error.response.data.error && error.response.data.error) {
             setPopupMessage({ 
               message: error.response.data.error, 
               type: 'error' 
