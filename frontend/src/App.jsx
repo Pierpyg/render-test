@@ -34,6 +34,7 @@ const App = () => {
     personService
       .getAll()
       .then(response => {
+        console.log('Fetched persons:', response.data)
         setPersons(response.data);
       });
   }, []);
@@ -67,19 +68,21 @@ const App = () => {
       const personObject = {
         name: newName,
         number: newNumber,
-        id: String(persons.length + 1),
+        
       };
 
       personService
         .create(personObject)
         .then(response => {
+          console.log('Added person:', response.data)
           setPersons(persons.concat(response.data));
           setPopupMessage({ message: `Added ${newName}.`, type: 'added' });
           setTimeout(() => setPopupMessage(null), 5000);
           setNewName('');
           setNewNumber('');
         })
-        .catch(() => {
+        .catch(error => {
+          console.error('Error adding person:', error)
           setPopupMessage({ message: 'Failed to add person to the server.', type: 'deleted' });
           setTimeout(() => setPopupMessage(null), 5000);
         });
@@ -87,15 +90,18 @@ const App = () => {
   };
 
   const deletePerson = (id, name) => {
+    console.log(`Attempting to delete person with ID: ${id}, Name: ${name}`)
     if (window.confirm(`Delete ${name}?`)) {
       personService
         .delete(id)
         .then(() => {
+          console.log(`Successfully deleted person with ID: ${id}`)
           setPersons(persons.filter(person => person.id !== id));
           setPopupMessage({ message: `Deleted ${name}.`, type: 'deleted' });
           setTimeout(() => setPopupMessage(null), 5000);
         })
-        .catch(() => {
+        .catch(error => {
+          console.error(`Error deleting person with ID: ${id}`, error)
           setPopupMessage({ message: `Information of '${name}' has already been removed from server`, type: 'deleted' });
           setTimeout(() => setPopupMessage(null), 5000);
           setPersons(persons.filter(person => person.id !== id));
